@@ -6,19 +6,24 @@ namespace server.Models;
 public class EquipmentStatusHistory
 {
     [Key]
+    [Column("id")]
     public int Id { get; set; }
     
-    public int EquipmentId { get; set; }
+    [Column("equipment_id")]
+    public Guid EquipmentId { get; set; }
     
     [Required]
     [MaxLength(20)]
-    public string Status { get; set; } = null!; // 机况：正常、异常、警告
+    [Column("status")]
+    public string Status { get; set; } = null!;
     
     [Required]
-    public DateTime StatusChangeTime { get; set; } // 状态切换时间
+    [Column("status_change_time")]
+    public DateTime StatusChangeTime { get; set; }
     
     [MaxLength(50)]
-    public string? ExecutedBy { get; set; } // 执行切换对象（人员/机台自身）
+    [Column("executed_by")]
+    public string? ExecutedBy { get; set; }
     
     // 导航属性
     [ForeignKey("EquipmentId")]

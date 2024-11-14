@@ -1,39 +1,34 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using server.Models;
+using server.Services;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-// 配置数据库连接
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// 配置AutoMapper
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
-
-// 配置JWT认证
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException()))
-        };
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo 
+    { 
+        Title = "智造分析",
+        Version = "v1",
+        Description = "智能制造数据分析平台API"
     });
+});
+
+// 添加数据库上下文
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion(new Version(8, 0, 0))
+    )
+);
+
+builder.Services.AddScoped<IAnalysisService, AnalysisService>();
 
 var app = builder.Build();
 
@@ -41,12 +36,14 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "智造分析 v1");
+    });
 }
 
 app.UseHttpsRedirection();
-app.UseAuthentication(); // 添加认证中间件
-app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

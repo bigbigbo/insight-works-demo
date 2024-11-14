@@ -1,23 +1,43 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace server.Models;
 
 public class Equipment
 {
     [Key]
-    public int Id { get; set; }
+    [Column("id")]
+    public Guid Id { get; set; } = Guid.NewGuid();
     
     [Required]
     [MaxLength(50)]
-    public string EquipmentCode { get; set; } = null!; // 设备编号，如"智能A-1"
+    [Column("equipment_code")]
+    public string EquipmentCode { get; set; } = null!;
     
     [Required]
     [MaxLength(50)]
-    public string Manufacturer { get; set; } = null!; // 制造商，如"厂商A"
+    [Column("manufacturer")]
+    public string Manufacturer { get; set; } = null!;
     
+    [MaxLength(50)]
+    [Column("contact_person")]
+    public string? ContactPerson { get; set; }
+    
+    [MaxLength(20)]
+    [Column("contact_phone")]
+    public string? ContactPhone { get; set; }
+    
+    [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
+    [Column("updated_at")]
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    
     // 导航属性
-    public virtual ICollection<EquipmentStatusHistory> StatusHistories { get; set; } = null!;
-    public virtual ICollection<ProductionRecord> ProductionRecords { get; set; } = null!;
+    [JsonIgnore]
+    public virtual ICollection<EquipmentStatusHistory>? StatusHistories { get; set; }
+    
+    [JsonIgnore]
+    public virtual ICollection<ProductionRecord>? ProductionRecords { get; set; }
 } 
