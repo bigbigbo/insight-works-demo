@@ -1,0 +1,74 @@
+# .NET Core 构建输出目录
+bin/
+obj/
+
+# Visual Studio 文件
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+# 构建结果
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Visual Studio 2015/2017 缓存/选项目录
+.vs/
+
+# IDE 设置文件
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# 用户特定文件
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider IDE
+.idea/
+
+# 用户特定文件
+appsettings.Development.json
+appsettings.Production.json
+*.Development.json
+*.Production.json
+
+# 日志文件
+*.log
+
+# 本地数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 临时文件
+*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
+nupkg/
+
+# 测试结果
+TestResults/
+[Tt]est[Rr]esult*/
+
+# Database
+Migrations/
