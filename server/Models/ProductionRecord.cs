@@ -7,13 +7,13 @@ public class ProductionRecord
 {
     [Key]
     [Column("id")]
-    public int Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     
     [Column("equipment_id")]
     public Guid EquipmentId { get; set; }
     
     [Column("product_model_id")]
-    public int ProductModelId { get; set; }
+    public Guid ProductModelId { get; set; }
     
     [Required]
     [MaxLength(100)]

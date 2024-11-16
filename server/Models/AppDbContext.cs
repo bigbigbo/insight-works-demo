@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<EquipmentStatusHistory> EquipmentStatusHistories { get; set; } = null!;
     public DbSet<ProductModel> ProductModels { get; set; } = null!;
     public DbSet<ProductionRecord> ProductionRecords { get; set; } = null!;
+    public DbSet<Manufacturer> Manufacturers { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -23,6 +24,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<EquipmentStatusHistory>().ToTable("equipment_status_history");
         modelBuilder.Entity<ProductModel>().ToTable("product_model");
         modelBuilder.Entity<ProductionRecord>().ToTable("production_record");
+        modelBuilder.Entity<Manufacturer>().ToTable("manufacturer");
 
         // 设置索引
         modelBuilder.Entity<Equipment>()
@@ -43,6 +45,11 @@ public class AppDbContext : DbContext
             .HasIndex(e => new { e.EquipmentId, e.StatusChangeTime })
             .HasDatabaseName("ix_equipment_status_time");
 
+        modelBuilder.Entity<Manufacturer>()
+            .HasIndex(m => m.ManufacturerCode)
+            .IsUnique()
+            .HasDatabaseName("ix_manufacturer_code");
+
         // 配置关系
         modelBuilder.Entity<EquipmentStatusHistory>()
             .HasOne(e => e.Equipment)
@@ -61,5 +68,11 @@ public class AppDbContext : DbContext
             .WithMany(m => m.ProductionRecords)
             .HasForeignKey(p => p.ProductModelId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Equipment>()
+            .HasOne(e => e.Manufacturer)
+            .WithMany(m => m.Equipments)
+            .HasForeignKey(e => e.ManufacturerId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 } 

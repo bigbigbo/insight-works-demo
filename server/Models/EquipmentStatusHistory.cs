@@ -7,7 +7,7 @@ public class EquipmentStatusHistory
 {
     [Key]
     [Column("id")]
-    public int Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     
     [Column("equipment_id")]
     public Guid EquipmentId { get; set; }

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace InsightWorks.Models;
 
-public class Equipment
+public class Manufacturer
 {
     [Key]
     [Column("id")]
@@ -12,8 +12,17 @@ public class Equipment
     
     [Required]
     [MaxLength(50)]
-    [Column("equipment_code")]
-    public string EquipmentCode { get; set; } = null!;
+    [Column("manufacturer_code")]
+    public string ManufacturerCode { get; set; } = null!;
+    
+    [Required]
+    [MaxLength(100)]
+    [Column("name")]
+    public string Name { get; set; } = null!;
+    
+    [MaxLength(200)]
+    [Column("address")]
+    public string? Address { get; set; }
     
     [MaxLength(50)]
     [Column("contact_person")]
@@ -29,16 +38,7 @@ public class Equipment
     [Column("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     
-    [Column("manufacturer_id")]
-    public Guid ManufacturerId { get; set; }
-    
     // 导航属性
     [JsonIgnore]
-    public virtual ICollection<EquipmentStatusHistory>? StatusHistories { get; set; }
-    
-    [JsonIgnore]
-    public virtual ICollection<ProductionRecord>? ProductionRecords { get; set; }
-    
-    [ForeignKey("ManufacturerId")]
-    public virtual Manufacturer Manufacturer { get; set; } = null!;
+    public virtual ICollection<Equipment>? Equipments { get; set; }
 } 
