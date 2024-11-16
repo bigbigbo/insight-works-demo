@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using server.Models;
-using server.DTOs;
+using InsightWorks.Models;
+using InsightWorks.DTOs;
 
-namespace server.Services;
+namespace InsightWorks.Services;
 
 public class AnalysisService : IAnalysisService
 {
@@ -13,103 +13,81 @@ public class AnalysisService : IAnalysisService
         _context = context;
     }
 
-    public async Task<List<GanttChartDTO>> GetEquipmentStatusGanttChart(
-        DateTime startTime, 
-        DateTime endTime, 
-        string? equipmentCode = null)
+    public async Task<List<GanttChartDTO>> GetEquipmentStatusGanttChart(DateTime startTime, DateTime endTime, string? equipmentCode = null)
     {
-        var query = _context.Equipment
-            .Include(e => e.StatusHistories)
-            .AsQueryable();
+        var query = _context.EquipmentStatusHistories
+            .Include(h => h.Equipment)
+            .Where(h => h.StatusChangeTime >= startTime && h.StatusChangeTime <= endTime);
 
         if (!string.IsNullOrEmpty(equipmentCode))
         {
-            query = query.Where(e => e.EquipmentCode == equipmentCode);
+            query = query.Where(h => h.Equipment.EquipmentCode == equipmentCode);
         }
 
-        var equipmentList = await query.ToListAsync();
-        var result = new List<GanttChartDTO>();
+        var statusHistories = await query
+            .OrderBy(h => h.Equipment.EquipmentCode)
+            .ThenBy(h => h.StatusChangeTime)
+            .ToListAsync();
 
-        foreach (var equipment in equipmentList)
+        var result = new List<GanttChartDTO>();
+        var equipmentGroups = statusHistories.GroupBy(h => h.Equipment.EquipmentCode);
+
+        foreach (var group in equipmentGroups)
         {
             var ganttChart = new GanttChartDTO
             {
-                EquipmentCode = equipment.EquipmentCode,
-                StatusPeriods = equipment.StatusHistories
-                    .Where(h => h.StatusChangeTime >= startTime && h.StatusChangeTime <= endTime)
-                    .OrderBy(h => h.StatusChangeTime)
-                    .Select((h, i) => new StatusPeriodDTO
-                    {
-                        Status = h.Status,
-                        StartTime = h.StatusChangeTime,
-                        EndTime = i < equipment.StatusHistories.Count - 1 
-                            ? equipment.StatusHistories.ElementAt(i + 1).StatusChangeTime 
-                            : endTime,
-                        ExecutedBy = h.ExecutedBy
-                    })
-                    .ToList()
+                EquipmentCode = group.Key,
+                StatusPeriods = new List<StatusPeriodDTO>()
             };
+
+            var orderedHistories = group.OrderBy(h => h.StatusChangeTime).ToList();
+            for (int i = 0; i < orderedHistories.Count - 1; i++)
+            {
+                ganttChart.StatusPeriods.Add(new StatusPeriodDTO
+                {
+                    Status = orderedHistories[i].Status,
+                    StartTime = orderedHistories[i].StatusChangeTime,
+                    EndTime = orderedHistories[i + 1].StatusChangeTime,
+                    ExecutedBy = orderedHistories[i].ExecutedBy
+                });
+            }
+
             result.Add(ganttChart);
         }
 
         return result;
     }
 
-    private DateTime GetTimePeriodStart(DateTime date, string timeUnit)
+    public async Task<List<ProductionAnalysisDTO>> GetProductionTimeAnalysis(string timeUnit, DateTime startTime, DateTime endTime, string? modelCode = null)
     {
-        switch (timeUnit.ToLower())
+        if (!new[] { "hour", "day", "week", "month" }.Contains(timeUnit.ToLower()))
         {
-            case "day":
-                return date.Date;
-            case "week":
-                return date.AddDays(-(int)date.DayOfWeek).Date;
-            case "month":
-                return new DateTime(date.Year, date.Month, 1);
-            default:
-                throw new ArgumentException("Invalid time unit. Use 'day', 'week', or 'month'.");
-        }
-    }
-
-    public async Task<List<ProductionAnalysisDTO>> GetProductionTimeAnalysis(
-        string timeUnit,
-        DateTime startTime,
-        DateTime endTime,
-        string? modelCode = null)
-    {
-        if (!new[] { "day", "week", "month" }.Contains(timeUnit.ToLower()))
-        {
-            throw new ArgumentException("Invalid time unit. Use 'day', 'week', or 'month'.");
+            throw new ArgumentException("Invalid time unit. Must be one of: hour, day, week, month");
         }
 
         var query = _context.ProductionRecords
-            .Include(p => p.Equipment)
-            .Include(p => p.ProductModel)
-            .Where(p => p.ProductionStartTime >= startTime && p.ProductionEndTime <= endTime);
+            .Include(r => r.Equipment)
+            .Include(r => r.ProductModel)
+            .Where(r => r.ProductionStartTime >= startTime && r.ProductionEndTime <= endTime);
 
         if (!string.IsNullOrEmpty(modelCode))
         {
-            query = query.Where(p => p.ProductModel.ModelCode == modelCode);
+            query = query.Where(r => r.ProductModel.ModelCode == modelCode);
         }
 
-        // 在内存中执行时间分组
         var records = await query.ToListAsync();
-        var groupedRecords = records
-            .GroupBy(p => new
-            {
-                p.ProductModel.ModelCode,
-                p.Equipment.EquipmentCode,
-                TimePeriod = GetTimePeriodStart(p.ProductionStartTime, timeUnit)
-            })
+
+        var analysis = records
+            .GroupBy(r => new { r.ProductModel.ModelCode, r.Equipment.EquipmentCode })
             .Select(g => new ProductionAnalysisDTO
             {
                 ModelCode = g.Key.ModelCode,
                 EquipmentCode = g.Key.EquipmentCode,
-                AverageProductionTime = g.Average(p => 
-                    (p.ProductionEndTime - p.ProductionStartTime).TotalMinutes),
+                AverageProductionTime = g.Average(r => (r.ProductionEndTime - r.ProductionStartTime).TotalMinutes),
                 TotalProductions = g.Count()
             })
             .ToList();
 
-        return groupedRecords;
+        return analysis;
     }
 } 

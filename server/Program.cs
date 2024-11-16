@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using server.Models;
-using server.Services;
 using Microsoft.OpenApi.Models;
+using InsightWorks.Models;
+using InsightWorks.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +29,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 builder.Services.AddScoped<IAnalysisService, AnalysisService>();
+builder.Services.AddScoped<IEquipmentService, EquipmentService>();
 
 var app = builder.Build();
 

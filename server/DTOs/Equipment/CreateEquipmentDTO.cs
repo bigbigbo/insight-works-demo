@@ -1,4 +1,4 @@
-namespace server.DTOs;
+namespace InsightWorks.DTOs.Equipment;
 
 public class CreateEquipmentDTO
 {

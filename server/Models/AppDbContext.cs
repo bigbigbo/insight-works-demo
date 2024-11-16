@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace server.Models;
+namespace InsightWorks.Models;
 
 public class AppDbContext : DbContext
 {

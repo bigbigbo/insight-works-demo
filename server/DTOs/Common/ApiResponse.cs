@@ -1,4 +1,4 @@
-namespace server.DTOs.Common;
+namespace InsightWorks.DTOs.Common;
 
 public class ApiResponse<T>
 {
@@ -7,7 +7,7 @@ public class ApiResponse<T>
     public T? Data { get; set; }
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     
-    public static ApiResponse<T> Ok(T data, string message = "Success")
+    public static ApiResponse<T> Ok(T? data, string message = "Success")
     {
         return new ApiResponse<T>
         {

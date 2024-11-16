@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace server.Models;
+namespace InsightWorks.Models;
 
 public class EquipmentStatusHistory
 {

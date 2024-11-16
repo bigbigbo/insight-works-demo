@@ -1,6 +1,6 @@
-using server.DTOs;
+using InsightWorks.DTOs;
 
-namespace server.Services;
+namespace InsightWorks.Services;
 
 public interface IAnalysisService
 {

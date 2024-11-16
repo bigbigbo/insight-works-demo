@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using server.Services;
-using server.DTOs;
+using InsightWorks.Services;
+using InsightWorks.DTOs;
 
-namespace server.Controllers;
+namespace InsightWorks.Controllers;
 
 [ApiController]
 [Route("analysis")]

@@ -1,4 +1,4 @@
-namespace server.DTOs.Equipment;
+namespace InsightWorks.DTOs.Equipment;
 
 public class DeleteEquipmentDTO
 {
