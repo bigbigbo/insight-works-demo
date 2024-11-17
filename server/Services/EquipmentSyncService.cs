@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using System.IO;
 using InsightWorks.Models.Enums;
+using InsightWorks.DTOs.Common;
 
 namespace InsightWorks.Services;
 
@@ -333,10 +334,44 @@ public class EquipmentSyncService : IEquipmentSyncService
                 throw new ArgumentException($"第{row}行的产品型号不存在：{modelCode}");
             }
 
-            if (!DateTime.TryParse(worksheet.Cells[row, 3].Text, out DateTime startTime) ||
-                !DateTime.TryParse(worksheet.Cells[row, 4].Text, out DateTime endTime))
+            if (!DateTime.TryParse(worksheet.Cells[row, 3].Value?.ToString(), out DateTime startTime))
             {
-                throw new ArgumentException($"第{row}行的时间格式无效");
+                // 尝试使用Excel的日期时间值
+                if (worksheet.Cells[row, 2].Value is double excelDate)
+                {
+                    try 
+                    {
+                        startTime = DateTime.FromOADate(excelDate);
+                    }
+                    catch
+                    {
+                        throw new ArgumentException($"第{row}行的生产开始时间格式无效，请使用标准日期时间格式（如：2024-03-21 14:30:00）");
+                    }
+                }
+                else 
+                {
+                    throw new ArgumentException($"第{row}行的生产开始时间格式无效，请使用标准日期��间格式（如：2024-03-21 14:30:00）");
+                }
+            }
+
+            if (!DateTime.TryParse(worksheet.Cells[row, 4].Value?.ToString(), out DateTime endTime))
+            {
+                // 尝试使用Excel的日期时间值
+                if (worksheet.Cells[row, 2].Value is double excelDate)
+                {
+                    try 
+                    {
+                        endTime = DateTime.FromOADate(excelDate);
+                    }
+                    catch
+                    {
+                        throw new ArgumentException($"第{row}行的生产结束时间格式无效，请使用标准日期时间格式（如：2024-03-21 14:30:00）");
+                    }
+                }
+                else 
+                {
+                    throw new ArgumentException($"第{row}行的生产结束时间格式无效，请使用标准日期时间格式（如：2024-03-21 14:30:00）");
+                }
             }
 
             productionList.Add(new ProductionRecord
@@ -344,12 +379,12 @@ public class EquipmentSyncService : IEquipmentSyncService
                 EquipmentId = equipmentId,
                 ProductModelId = productModel.Id,
                 BatchNumber = worksheet.Cells[row, 2].Text,
-                PreLength = decimal.Parse(worksheet.Cells[row, 5].Text),
-                PreWidth = decimal.Parse(worksheet.Cells[row, 6].Text),
-                PreHeight = decimal.Parse(worksheet.Cells[row, 7].Text),
-                PostLength = decimal.Parse(worksheet.Cells[row, 8].Text),
-                PostWidth = decimal.Parse(worksheet.Cells[row, 9].Text),
-                PostHeight = decimal.Parse(worksheet.Cells[row, 10].Text),
+                PreLength = worksheet.Cells[row, 5].Text,
+                PreWidth = worksheet.Cells[row, 6].Text,
+                PreHeight = worksheet.Cells[row, 7].Text,
+                PostLength = worksheet.Cells[row, 8].Text,
+                PostWidth = worksheet.Cells[row, 9].Text,
+                PostHeight = worksheet.Cells[row, 10].Text,
                 ProductionStartTime = startTime,
                 ProductionEndTime = endTime
             });
@@ -362,5 +397,53 @@ public class EquipmentSyncService : IEquipmentSyncService
 
         await _context.ProductionRecords.AddRangeAsync(productionList);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<PaginatedList<EquipmentSyncRecord>> QuerySyncRecordsAsync(SyncRecordQueryDTO query)
+    {
+        var queryable = _context.EquipmentSyncRecords
+            .Include(r => r.Equipment)
+                .ThenInclude(e => e.Manufacturer)
+            .AsQueryable();
+
+        // 应用查询条件
+        if (query.EquipmentId.HasValue)
+        {
+            queryable = queryable.Where(r => r.EquipmentId == query.EquipmentId);
+        }
+
+        if (query.SyncType.HasValue)
+        {
+            queryable = queryable.Where(r => r.SyncType == query.SyncType);
+        }
+
+        if (query.Status.HasValue)
+        {
+            queryable = queryable.Where(r => r.Status == query.Status);
+        }
+
+        if (query.StartTime.HasValue)
+        {
+            queryable = queryable.Where(r => r.SyncStartTime >= query.StartTime);
+        }
+
+        if (query.EndTime.HasValue)
+        {
+            queryable = queryable.Where(r => r.SyncStartTime <= query.EndTime);
+        }
+
+        // 按时间倒序排序
+        queryable = queryable.OrderByDescending(r => r.SyncStartTime);
+
+        // 执行分页查询
+        var records = await queryable
+            .Skip((query.PageIndex - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .ToListAsync();
+
+        // 获取总记录数
+        var totalCount = await queryable.CountAsync();
+
+        return new PaginatedList<EquipmentSyncRecord>(records, totalCount, query.PageIndex, query.PageSize);
     }
 } 

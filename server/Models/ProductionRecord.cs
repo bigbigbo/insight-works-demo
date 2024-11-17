@@ -21,24 +21,36 @@ public class ProductionRecord
     public string BatchNumber { get; set; } = null!;
     
     // 制程前规格
+    [Required]
+    [MaxLength(50)]
     [Column("pre_length")]
-    public decimal PreLength { get; set; }
+    public string PreLength { get; set; } = null!;
     
+    [Required]
+    [MaxLength(50)]
     [Column("pre_width")]
-    public decimal PreWidth { get; set; }
+    public string PreWidth { get; set; } = null!;
     
+    [Required]
+    [MaxLength(50)]
     [Column("pre_height")]
-    public decimal PreHeight { get; set; }
+    public string PreHeight { get; set; } = null!;
     
     // 制程后规格
+    [Required]
+    [MaxLength(50)]
     [Column("post_length")]
-    public decimal PostLength { get; set; }
+    public string PostLength { get; set; } = null!;
     
+    [Required]
+    [MaxLength(50)]
     [Column("post_width")]
-    public decimal PostWidth { get; set; }
+    public string PostWidth { get; set; } = null!;
     
+    [Required]
+    [MaxLength(50)]
     [Column("post_height")]
-    public decimal PostHeight { get; set; }
+    public string PostHeight { get; set; } = null!;
     
     [Column("production_start_time")]
     public DateTime ProductionStartTime { get; set; }

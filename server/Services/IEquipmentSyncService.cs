@@ -1,4 +1,6 @@
 using InsightWorks.DTOs.EquipmentSync;
+using InsightWorks.DTOs.Common;
+using InsightWorks.Models;
 
 namespace InsightWorks.Services;
 
@@ -23,4 +25,9 @@ public interface IEquipmentSyncService
     /// 上传 Excel 数据
     /// </summary>
     Task UploadExcelDataAsync(UploadExcelDTO data);
+
+    /// <summary>
+    /// 分页查询同步记录
+    /// </summary>
+    Task<PaginatedList<EquipmentSyncRecord>> QuerySyncRecordsAsync(SyncRecordQueryDTO query);
 } 

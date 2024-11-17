@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using InsightWorks.Services;
 using InsightWorks.DTOs.EquipmentSync;
 using InsightWorks.DTOs.Common;
+using InsightWorks.Models;
 
 namespace InsightWorks.Controllers;
 
@@ -101,6 +102,23 @@ public class EquipmentSyncController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, ApiResponse<object>.Fail(ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// 分页查询同步记录
+    /// </summary>
+    [HttpGet("records")]
+    public async Task<ActionResult<ApiResponse<PaginatedList<EquipmentSyncRecord>>>> QuerySyncRecords([FromQuery] SyncRecordQueryDTO query)
+    {
+        try
+        {
+            var records = await _equipmentSyncService.QuerySyncRecordsAsync(query);
+            return Ok(ApiResponse<PaginatedList<EquipmentSyncRecord>>.Ok(records));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ApiResponse<PaginatedList<EquipmentSyncRecord>>.Fail(ex.Message));
         }
     }
 } 

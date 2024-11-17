@@ -1,4 +1,5 @@
 namespace InsightWorks.DTOs.EquipmentSync;
+using System.ComponentModel.DataAnnotations;
 
 public class UploadProductionDataDTO
 {
@@ -28,32 +29,38 @@ public class ProductionData
     /// <summary>
     /// 制程前长度
     /// </summary>
-    public decimal PreLength { get; set; }
+    [Required]
+    public string PreLength { get; set; } = string.Empty;
 
     /// <summary>
     /// 制程前宽度
     /// </summary>
-    public decimal PreWidth { get; set; }
+    [Required]
+    public string PreWidth { get; set; } = string.Empty;
 
     /// <summary>
     /// 制程前高度
     /// </summary>
-    public decimal PreHeight { get; set; }
+    [Required]
+    public string PreHeight { get; set; } = string.Empty;
 
     /// <summary>
     /// 制程后长度
     /// </summary>
-    public decimal PostLength { get; set; }
+    [Required]
+    public string PostLength { get; set; } = string.Empty;
 
     /// <summary>
     /// 制程后宽度
     /// </summary>
-    public decimal PostWidth { get; set; }
+    [Required]
+    public string PostWidth { get; set; } = string.Empty;
 
     /// <summary>
     /// 制程后高度
     /// </summary>
-    public decimal PostHeight { get; set; }
+    [Required]
+    public string PostHeight { get; set; } = string.Empty;
 
     /// <summary>
     /// 生产开始时间
