@@ -6,7 +6,7 @@ using InsightWorks.DTOs.Common;
 namespace InsightWorks.Controllers;
 
 [ApiController]
-[Route("device-sync")]
+[Route("equipment-sync")]
 public class EquipmentSyncController : ControllerBase
 {
     private readonly IEquipmentSyncService _equipmentSyncService;

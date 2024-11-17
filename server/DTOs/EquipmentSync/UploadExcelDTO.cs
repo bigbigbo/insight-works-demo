@@ -1,4 +1,5 @@
 namespace InsightWorks.DTOs.EquipmentSync;
+using InsightWorks.Models.Enums;
 
 public class UploadExcelDTO
 {
@@ -8,9 +9,9 @@ public class UploadExcelDTO
     public Guid EquipmentId { get; set; }
 
     /// <summary>
-    /// 同步类型：Status-机况数据, Production-生产数据
+    /// 同步类型
     /// </summary>
-    public string SyncType { get; set; } = null!;
+    public SyncType SyncType { get; set; }
 
     /// <summary>
     /// Excel文件

@@ -3,6 +3,7 @@ using InsightWorks.Models;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using System.IO;
+using InsightWorks.Models.Enums;
 
 namespace InsightWorks.Services;
 
@@ -36,7 +37,7 @@ public class EquipmentSyncService : IEquipmentSyncService
             EquipmentId = command.EquipmentId,
             SyncType = command.SyncType,
             SyncStartTime = DateTime.UtcNow,
-            Status = "Failed"
+            Status = SyncStatus.Failed
         };
 
         _context.EquipmentSyncRecords.Add(syncRecord);
@@ -44,7 +45,7 @@ public class EquipmentSyncService : IEquipmentSyncService
 
         try
         {
-            // TODO: 实��与设备的实际通信逻辑
+            // TODO: 实与设备的实际通信逻辑
             // 这里需要根据实际的设备通信协议来实现
             
             _logger.LogInformation(
@@ -55,7 +56,7 @@ public class EquipmentSyncService : IEquipmentSyncService
             );
 
             // 更新同步记录状态为成功
-            syncRecord.Status = "Success";
+            syncRecord.Status = SyncStatus.Success;
             syncRecord.SyncEndTime = DateTime.UtcNow;
             await _context.SaveChangesAsync();
         }
@@ -86,9 +87,10 @@ public class EquipmentSyncService : IEquipmentSyncService
         // 验证状态数据
         foreach (var status in data.StatusList)
         {
-            if (string.IsNullOrWhiteSpace(status.Status))
+            if (string.IsNullOrWhiteSpace(status.Status) || 
+                !Enum.TryParse<EquipmentStatus>(status.Status, true, out _))
             {
-                throw new ArgumentException("设备状态不能为空");
+                throw new ArgumentException("无效的设备状态");
             }
         }
 
@@ -96,7 +98,7 @@ public class EquipmentSyncService : IEquipmentSyncService
         var statusHistories = data.StatusList.Select(s => new EquipmentStatusHistory
         {
             EquipmentId = data.EquipmentId,
-            Status = s.Status,
+            Status = Enum.Parse<EquipmentStatus>(s.Status, true),
             StatusChangeTime = s.StatusChangeTime,
             ExecutedBy = s.ExecutedBy
         }).ToList();
@@ -193,7 +195,7 @@ public class EquipmentSyncService : IEquipmentSyncService
             EquipmentId = data.EquipmentId,
             SyncType = data.SyncType,
             SyncStartTime = DateTime.UtcNow,
-            Status = "Failed"
+            Status = SyncStatus.Failed
         };
 
         _context.EquipmentSyncRecords.Add(syncRecord);
@@ -215,14 +217,14 @@ public class EquipmentSyncService : IEquipmentSyncService
             var rowCount = worksheet.Dimension.Rows;
             if (rowCount <= 1)  // 只有标题行
             {
-                throw new ArgumentException("Excel文件没有数据");
+                throw new ArgumentException("Excel文件有数据");
             }
 
-            if (data.SyncType == "Status")
+            if (data.SyncType == SyncType.Status)
             {
                 await ProcessStatusExcel(worksheet, data.EquipmentId);
             }
-            else if (data.SyncType == "Production")
+            else if (data.SyncType == SyncType.Production)
             {
                 await ProcessProductionExcel(worksheet, data.EquipmentId);
             }
@@ -232,7 +234,7 @@ public class EquipmentSyncService : IEquipmentSyncService
             }
 
             // 更新同步记录状态为成功
-            syncRecord.Status = "Success";
+            syncRecord.Status = SyncStatus.Success;
             syncRecord.SyncEndTime = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
@@ -259,12 +261,17 @@ public class EquipmentSyncService : IEquipmentSyncService
         var statusList = new List<EquipmentStatusHistory>();
         var rowCount = worksheet.Dimension.Rows;
 
-        for (int row = 2; row <= rowCount; row++)  // 从第2行开始（跳过标题行）
+        for (int row = 2; row <= rowCount; row++)
         {
-            var status = worksheet.Cells[row, 1].Text;
-            if (string.IsNullOrWhiteSpace(status))
+            var statusText = worksheet.Cells[row, 1].Text;
+            if (string.IsNullOrWhiteSpace(statusText))
             {
                 continue;
+            }
+
+            if (!Enum.TryParse<EquipmentStatus>(statusText, true, out EquipmentStatus status))
+            {
+                throw new ArgumentException($"第{row}行的设备状态无效");
             }
 
             if (!DateTime.TryParse(worksheet.Cells[row, 2].Text, out DateTime statusChangeTime))

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using InsightWorks.Models.Enums;
 
 namespace InsightWorks.Models;
 
@@ -13,9 +14,8 @@ public class EquipmentSyncRecord
     public Guid EquipmentId { get; set; }
     
     [Required]
-    [MaxLength(20)]
     [Column("sync_type")]
-    public string SyncType { get; set; } = null!;  // Status/Production
+    public SyncType SyncType { get; set; }
     
     [Column("sync_start_time")]
     public DateTime SyncStartTime { get; set; }
@@ -24,9 +24,8 @@ public class EquipmentSyncRecord
     public DateTime? SyncEndTime { get; set; }
     
     [Required]
-    [MaxLength(20)]
     [Column("status")]
-    public string Status { get; set; } = "Failed";  // Success/Failed
+    public SyncStatus Status { get; set; } = SyncStatus.Failed;
     
     [Column("error_message")]
     public string? ErrorMessage { get; set; }
@@ -34,7 +33,6 @@ public class EquipmentSyncRecord
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
-    // 导航属性
     [ForeignKey("EquipmentId")]
     public virtual Equipment Equipment { get; set; } = null!;
 } 

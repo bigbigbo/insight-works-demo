@@ -1,4 +1,5 @@
 namespace InsightWorks.DTOs.EquipmentSync;
+using InsightWorks.Models.Enums;
 
 public class SyncCommandDTO
 {
@@ -8,9 +9,9 @@ public class SyncCommandDTO
     public Guid EquipmentId { get; set; }
 
     /// <summary>
-    /// 同步类型：Status-机况数据, Production-生产数据
+    /// 同步类型
     /// </summary>
-    public string SyncType { get; set; } = null!;
+    public SyncType SyncType { get; set; }
 
     /// <summary>
     /// 开始时间
@@ -24,12 +25,6 @@ public class SyncCommandDTO
 
     public bool IsValid()
     {
-        if (string.IsNullOrWhiteSpace(SyncType))
-            return false;
-
-        if (SyncType != "Status" && SyncType != "Production")
-            return false;
-
         if (StartTime >= EndTime)
             return false;
 

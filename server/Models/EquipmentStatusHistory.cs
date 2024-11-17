@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using InsightWorks.Models.Enums;
 
 namespace InsightWorks.Models;
 
@@ -13,9 +14,8 @@ public class EquipmentStatusHistory
     public Guid EquipmentId { get; set; }
     
     [Required]
-    [MaxLength(20)]
     [Column("status")]
-    public string Status { get; set; } = null!;
+    public EquipmentStatus Status { get; set; }
     
     [Required]
     [Column("status_change_time")]
@@ -25,7 +25,6 @@ public class EquipmentStatusHistory
     [Column("executed_by")]
     public string? ExecutedBy { get; set; }
     
-    // 导航属性
     [ForeignKey("EquipmentId")]
     public virtual Equipment Equipment { get; set; } = null!;
 } 
