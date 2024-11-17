@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<ProductModel> ProductModels { get; set; } = null!;
     public DbSet<ProductionRecord> ProductionRecords { get; set; } = null!;
     public DbSet<Manufacturer> Manufacturers { get; set; } = null!;
+    public DbSet<EquipmentSyncRecord> EquipmentSyncRecords { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,6 +26,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<ProductModel>().ToTable("product_model");
         modelBuilder.Entity<ProductionRecord>().ToTable("production_record");
         modelBuilder.Entity<Manufacturer>().ToTable("manufacturer");
+        modelBuilder.Entity<EquipmentSyncRecord>().ToTable("equipment_sync_record");
 
         // 设置索引
         modelBuilder.Entity<Equipment>()
@@ -50,6 +52,10 @@ public class AppDbContext : DbContext
             .IsUnique()
             .HasDatabaseName("ix_manufacturer_code");
 
+        modelBuilder.Entity<EquipmentSyncRecord>()
+            .HasIndex(e => new { e.EquipmentId, e.SyncStartTime })
+            .HasDatabaseName("ix_equipment_sync_time");
+
         // 配置关系
         modelBuilder.Entity<EquipmentStatusHistory>()
             .HasOne(e => e.Equipment)
@@ -74,5 +80,11 @@ public class AppDbContext : DbContext
             .WithMany(m => m.Equipments)
             .HasForeignKey(e => e.ManufacturerId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<EquipmentSyncRecord>()
+            .HasOne(e => e.Equipment)
+            .WithMany()
+            .HasForeignKey(e => e.EquipmentId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 } 
