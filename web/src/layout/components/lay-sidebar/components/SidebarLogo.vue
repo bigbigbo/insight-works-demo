@@ -49,6 +49,7 @@ const { title, getLogo } = useNav();
     align-items: center;
     height: 100%;
     padding-left: 10px;
+    justify-content: center;
 
     img {
       display: inline-block;

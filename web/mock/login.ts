@@ -12,7 +12,7 @@ export default defineFakeRoute([
           data: {
             avatar: "https://avatars.githubusercontent.com/u/44761321",
             username: "admin",
-            nickname: "小铭",
+            nickname: "管理员",
             // 一个用户可能有多个角色
             roles: ["admin"],
             // 按钮级别权限
@@ -28,7 +28,7 @@ export default defineFakeRoute([
           data: {
             avatar: "https://avatars.githubusercontent.com/u/52823142",
             username: "common",
-            nickname: "小林",
+            nickname: "普通用户",
             roles: ["common"],
             permissions: ["permission:btn:add", "permission:btn:edit"],
             accessToken: "eyJhbGciOiJIUzUxMiJ9.common",
