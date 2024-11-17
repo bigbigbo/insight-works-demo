@@ -109,7 +109,8 @@ export default defineFlatConfig([
           argsIgnorePattern: "^_",
           varsIgnorePattern: "^_"
         }
-      ]
+      ],
+      "@typescript-eslint/no-extraneous-class": "off"
     }
   },
   {
