@@ -96,6 +96,45 @@ export interface EquipmentPaginatedListApiResponse {
   timestamp?: string;
 }
 
+export interface EquipmentSyncRecord {
+  /** @format uuid */
+  id?: string;
+  /** @format uuid */
+  equipmentId?: string;
+  syncType: SyncType;
+  /** @format date-time */
+  syncStartTime?: string;
+  /** @format date-time */
+  syncEndTime?: string | null;
+  status: SyncStatus;
+  errorMessage?: string | null;
+  /** @format date-time */
+  createdAt?: string;
+  equipment?: Equipment;
+}
+
+export interface EquipmentSyncRecordPaginatedList {
+  items?: EquipmentSyncRecord[] | null;
+  /** @format int32 */
+  pageIndex?: number;
+  /** @format int32 */
+  pageSize?: number;
+  /** @format int32 */
+  totalCount?: number;
+  /** @format int32 */
+  totalPages?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+}
+
+export interface EquipmentSyncRecordPaginatedListApiResponse {
+  success?: boolean;
+  message?: string | null;
+  data?: EquipmentSyncRecordPaginatedList;
+  /** @format date-time */
+  timestamp?: string;
+}
+
 export interface Manufacturer {
   /** @format uuid */
   id?: string;
@@ -204,6 +243,28 @@ export interface ProductModelPaginatedListApiResponse {
   timestamp?: string;
 }
 
+export interface ProductionData {
+  /** @format uuid */
+  productModelId?: string;
+  batchNumber?: string | null;
+  /** @format double */
+  preLength?: number;
+  /** @format double */
+  preWidth?: number;
+  /** @format double */
+  preHeight?: number;
+  /** @format double */
+  postLength?: number;
+  /** @format double */
+  postWidth?: number;
+  /** @format double */
+  postHeight?: number;
+  /** @format date-time */
+  productionStartTime?: string;
+  /** @format date-time */
+  productionEndTime?: string;
+}
+
 export interface ProductionRecord {
   /** @format uuid */
   id?: string;
@@ -236,6 +297,35 @@ export interface ProductionRecord {
   productModel?: ProductModel;
 }
 
+export interface StatusData {
+  status?: string | null;
+  /** @format date-time */
+  statusChangeTime?: string;
+  executedBy?: string | null;
+}
+
+export interface SyncCommandDTO {
+  /** @format uuid */
+  equipmentId?: string;
+  syncType?: SyncType;
+  /** @format date-time */
+  startTime?: string;
+  /** @format date-time */
+  endTime?: string;
+}
+
+/** @format int32 */
+export enum SyncStatus {
+  Value0 = 0,
+  Value1 = 1
+}
+
+/** @format int32 */
+export enum SyncType {
+  Value0 = 0,
+  Value1 = 1
+}
+
 export interface UpdateEquipmentDTO {
   /** @format uuid */
   id?: string;
@@ -261,4 +351,16 @@ export interface UpdateProductDTO {
   id?: string;
   modelCode?: string | null;
   description?: string | null;
+}
+
+export interface UploadProductionDataDTO {
+  /** @format uuid */
+  equipmentId?: string;
+  productionList?: ProductionData[] | null;
+}
+
+export interface UploadStatusDataDTO {
+  /** @format uuid */
+  equipmentId?: string;
+  statusList?: StatusData[] | null;
 }

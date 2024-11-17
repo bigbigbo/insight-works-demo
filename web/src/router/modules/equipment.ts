@@ -19,11 +19,11 @@ export default {
       }
     },
     {
-      path: "/equipment/data-sync",
-      name: "EquipmentDataSync",
-      component: () => import("@/views/equipment/data-sync.vue"),
+      path: "/equipment/sync-log",
+      name: "EquipmentSyncLog",
+      component: () => import("@/views/equipment/sync-log.vue"),
       meta: {
-        title: "数据同步",
+        title: "同步记录",
         showParent: true
       }
     }

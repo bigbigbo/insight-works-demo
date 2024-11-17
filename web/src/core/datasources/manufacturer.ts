@@ -22,9 +22,13 @@ export function getManufacturerList(params: ManufacturerListParams) {
 }
 
 export function createManufacturer(data: CreateManufacturerDTO) {
-  return http.request<ManufacturerApiResponse>("post", "/api/manufacturers", {
-    data
-  });
+  return http.request<ManufacturerApiResponse>(
+    "post",
+    "/api/manufacturers/create",
+    {
+      data
+    }
+  );
 }
 
 export function updateManufacturer(data: UpdateManufacturerDTO) {

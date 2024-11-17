@@ -19,13 +19,16 @@
         :width="col.width"
         show-overflow-tooltip
       />
-      <el-table-column label="操作" width="114" fixed="right">
+      <el-table-column label="操作" width="180" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" link @click="handleEdit(row)"
             >编辑</el-button
           >
           <el-button type="danger" link @click="handleDelete(row)"
             >删除</el-button
+          >
+          <el-button type="success" link @click="handleSync(row)"
+            >同步数据</el-button
           >
         </template>
       </el-table-column>
@@ -37,6 +40,12 @@
       :data="currentRow"
       @success="handleSuccess"
     />
+
+    <data-sync-modal
+      v-model:visible="syncDialogVisible"
+      :data="currentRow"
+      @success="handleSyncSuccess"
+    />
   </div>
 </template>
 
@@ -46,6 +55,7 @@ import QueryTable from "@/components/query-table/index.vue";
 import { EquipmentService } from "@/core/services/equipment";
 import { ElMessage, ElMessageBox } from "element-plus";
 import EquipmentForm from "./components/equipment-form.vue";
+import DataSyncModal from "@/components/equipment-sync-modal/index.vue";
 
 defineOptions({
   name: "EquipmentList"
@@ -53,6 +63,7 @@ defineOptions({
 
 const tableRef = ref();
 const dialogVisible = ref(false);
+const syncDialogVisible = ref(false);
 const isEdit = ref(false);
 const currentRow = ref({});
 
@@ -125,7 +136,16 @@ const handleDelete = row => {
     });
 };
 
+const handleSync = row => {
+  currentRow.value = row;
+  syncDialogVisible.value = true;
+};
+
 const handleSuccess = () => {
+  tableRef.value?.refresh();
+};
+
+const handleSyncSuccess = () => {
   tableRef.value?.refresh();
 };
 </script>

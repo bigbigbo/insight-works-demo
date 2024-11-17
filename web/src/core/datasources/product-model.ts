@@ -23,7 +23,7 @@ export function getProductModelList(params: ProductModelListParams) {
 }
 
 export function createProductModel(data: CreateProductDTO) {
-  return http.request<ProductModelApiResponse>("post", "/api/products", {
+  return http.request<ProductModelApiResponse>("post", "/api/products/create", {
     data
   });
 }
