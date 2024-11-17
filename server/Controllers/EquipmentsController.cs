@@ -18,10 +18,18 @@ public class EquipmentsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IEnumerable<Equipment>>>> GetEquipments()
+    public async Task<ActionResult<ApiResponse<PaginatedList<Equipment>>>> GetAllEquipments(
+        [FromQuery] PaginationQuery query)
     {
-        var equipments = await _equipmentService.GetAllEquipmentsAsync();
-        return Ok(ApiResponse<IEnumerable<Equipment>>.Ok(equipments));
+        try
+        {
+            var equipments = await _equipmentService.GetAllEquipmentsAsync(query);
+            return Ok(ApiResponse<PaginatedList<Equipment>>.Ok(equipments));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ApiResponse<PaginatedList<Equipment>>.Fail(ex.Message));
+        }
     }
 
     [HttpGet("{id}")]

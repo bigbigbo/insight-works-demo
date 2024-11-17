@@ -18,16 +18,17 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IEnumerable<ProductModel>>>> GetAllProducts()
+    public async Task<ActionResult<ApiResponse<PaginatedList<ProductModel>>>> GetAllProducts(
+        [FromQuery] PaginationQuery query)
     {
         try
         {
-            var products = await _productService.GetAllProductsAsync();
-            return Ok(ApiResponse<IEnumerable<ProductModel>>.Ok(products));
+            var products = await _productService.GetAllProductsAsync(query);
+            return Ok(ApiResponse<PaginatedList<ProductModel>>.Ok(products));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponse<IEnumerable<ProductModel>>.Fail(ex.Message));
+            return StatusCode(500, ApiResponse<PaginatedList<ProductModel>>.Fail(ex.Message));
         }
     }
 

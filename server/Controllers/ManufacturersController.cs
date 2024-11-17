@@ -18,16 +18,17 @@ public class ManufacturersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IEnumerable<Manufacturer>>>> GetAllManufacturers()
+    public async Task<ActionResult<ApiResponse<PaginatedList<Manufacturer>>>> GetAllManufacturers(
+        [FromQuery] PaginationQuery query)
     {
         try
         {
-            var manufacturers = await _manufacturerService.GetAllManufacturersAsync();
-            return Ok(ApiResponse<IEnumerable<Manufacturer>>.Ok(manufacturers));
+            var manufacturers = await _manufacturerService.GetAllManufacturersAsync(query);
+            return Ok(ApiResponse<PaginatedList<Manufacturer>>.Ok(manufacturers));
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ApiResponse<IEnumerable<Manufacturer>>.Fail(ex.Message));
+            return StatusCode(500, ApiResponse<PaginatedList<Manufacturer>>.Fail(ex.Message));
         }
     }
 

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using InsightWorks.Models;
 using InsightWorks.DTOs.Equipment;
+using InsightWorks.DTOs.Common;
 
 namespace InsightWorks.Services;
 
@@ -13,12 +14,20 @@ public class EquipmentService : IEquipmentService
         _context = context;
     }
 
-    public async Task<IEnumerable<Equipment>> GetAllEquipmentsAsync()
+    public async Task<PaginatedList<Equipment>> GetAllEquipmentsAsync(PaginationQuery query)
     {
-        return await _context.Equipment
+        var equipments = _context.Equipment
             .Include(e => e.Manufacturer)
-            .OrderBy(e => e.EquipmentCode)
+            .OrderBy(e => e.EquipmentCode);
+
+        var totalCount = await equipments.CountAsync();
+        
+        var items = await equipments
+            .Skip((query.PageIndex - 1) * query.PageSize)
+            .Take(query.PageSize)
             .ToListAsync();
+
+        return new PaginatedList<Equipment>(items, totalCount, query.PageIndex, query.PageSize);
     }
 
     public async Task<Equipment?> GetEquipmentByIdAsync(Guid id)

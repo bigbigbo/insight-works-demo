@@ -1,5 +1,6 @@
 using InsightWorks.Models;
 using InsightWorks.DTOs.Product;
+using InsightWorks.DTOs.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace InsightWorks.Services;
@@ -13,11 +14,19 @@ public class ProductService : IProductService
         _context = context;
     }
 
-    public async Task<IEnumerable<ProductModel>> GetAllProductsAsync()
+    public async Task<PaginatedList<ProductModel>> GetAllProductsAsync(PaginationQuery query)
     {
-        return await _context.ProductModels
-            .OrderBy(p => p.ModelCode)
+        var products = _context.ProductModels
+            .OrderBy(p => p.ModelCode);
+
+        var totalCount = await products.CountAsync();
+        
+        var items = await products
+            .Skip((query.PageIndex - 1) * query.PageSize)
+            .Take(query.PageSize)
             .ToListAsync();
+
+        return new PaginatedList<ProductModel>(items, totalCount, query.PageIndex, query.PageSize);
     }
 
     public async Task<ProductModel?> GetProductByIdAsync(Guid id)

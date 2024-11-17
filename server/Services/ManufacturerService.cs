@@ -1,5 +1,6 @@
 using InsightWorks.Models;
 using InsightWorks.DTOs.Manufacturer;
+using InsightWorks.DTOs.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace InsightWorks.Services;
@@ -13,11 +14,19 @@ public class ManufacturerService : IManufacturerService
         _context = context;
     }
 
-    public async Task<IEnumerable<Manufacturer>> GetAllManufacturersAsync()
+    public async Task<PaginatedList<Manufacturer>> GetAllManufacturersAsync(PaginationQuery query)
     {
-        return await _context.Manufacturers
-            .OrderBy(m => m.ManufacturerCode)
+        var manufacturers = _context.Manufacturers
+            .OrderBy(m => m.ManufacturerCode);
+
+        var totalCount = await manufacturers.CountAsync();
+        
+        var items = await manufacturers
+            .Skip((query.PageIndex - 1) * query.PageSize)
+            .Take(query.PageSize)
             .ToListAsync();
+
+        return new PaginatedList<Manufacturer>(items, totalCount, query.PageIndex, query.PageSize);
     }
 
     public async Task<Manufacturer?> GetManufacturerByIdAsync(Guid id)
