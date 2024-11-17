@@ -1,12 +1,12 @@
 <template>
-  <div class="equipment-list">
+  <div class="product-model-list">
     <div class="header-actions mb-2">
-      <el-button type="primary" @click="handleAdd">新增设备</el-button>
+      <el-button type="primary" @click="handleAdd">新增型号</el-button>
     </div>
 
     <query-table
       ref="tableRef"
-      :api="EquipmentService.getList"
+      :api="ProductModelService.getList"
       :columns="columns"
       :show-index="true"
       :stripe="true"
@@ -31,7 +31,7 @@
       </el-table-column>
     </query-table>
 
-    <equipment-form
+    <product-model-form
       v-model:visible="dialogVisible"
       :is-edit="isEdit"
       :data="currentRow"
@@ -43,12 +43,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import QueryTable from "@/components/query-table/index.vue";
-import { EquipmentService } from "@/core/services/equipment";
+import { ProductModelService } from "@/core/services/product-model";
 import { ElMessage, ElMessageBox } from "element-plus";
-import EquipmentForm from "./components/equipment-form.vue";
+import ProductModelForm from "./components/product-model-form.vue";
 
 defineOptions({
-  name: "EquipmentList"
+  name: "ProductModelList"
 });
 
 const tableRef = ref();
@@ -58,33 +58,17 @@ const currentRow = ref({});
 
 const columns = [
   {
-    prop: "equipmentCode",
-    label: "设备编号",
+    prop: "modelCode",
+    label: "型号编码",
     width: 200
   },
   {
-    prop: "manufacturer.name",
-    label: "厂商名称",
-    width: 180
-  },
-  {
-    prop: "contactPerson",
-    label: "联系人",
-    width: 120
-  },
-  {
-    prop: "contactPhone",
-    label: "联系电话",
-    width: 120
+    prop: "description",
+    label: "描述"
   },
   {
     prop: "formattedCreatedAt",
     label: "创建时间",
-    width: 180
-  },
-  {
-    prop: "formattedUpdatedAt",
-    label: "更新时间",
     width: 180
   }
 ];
@@ -102,14 +86,14 @@ const handleEdit = row => {
 };
 
 const handleDelete = row => {
-  ElMessageBox.confirm("确认删除该设备吗?", "提示", {
+  ElMessageBox.confirm("确认删除该型号吗?", "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning"
   })
     .then(async () => {
       try {
-        const res = await EquipmentService.delete({ id: row.id });
+        const res = await ProductModelService.delete({ id: row.id });
         if (res.success) {
           ElMessage.success("删除成功");
           tableRef.value?.refresh();

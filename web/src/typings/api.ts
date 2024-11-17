@@ -74,10 +74,24 @@ export interface EquipmentApiResponse {
   timestamp?: string;
 }
 
-export interface EquipmentIEnumerableApiResponse {
+export interface EquipmentPaginatedList {
+  items?: Equipment[] | null;
+  /** @format int32 */
+  pageIndex?: number;
+  /** @format int32 */
+  pageSize?: number;
+  /** @format int32 */
+  totalCount?: number;
+  /** @format int32 */
+  totalPages?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+}
+
+export interface EquipmentPaginatedListApiResponse {
   success?: boolean;
   message?: string | null;
-  data?: Equipment[] | null;
+  data?: EquipmentPaginatedList;
   /** @format date-time */
   timestamp?: string;
 }
@@ -168,10 +182,24 @@ export interface ProductModelApiResponse {
   timestamp?: string;
 }
 
-export interface ProductModelIEnumerableApiResponse {
+export interface ProductModelPaginatedList {
+  items?: ProductModel[] | null;
+  /** @format int32 */
+  pageIndex?: number;
+  /** @format int32 */
+  pageSize?: number;
+  /** @format int32 */
+  totalCount?: number;
+  /** @format int32 */
+  totalPages?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+}
+
+export interface ProductModelPaginatedListApiResponse {
   success?: boolean;
   message?: string | null;
-  data?: ProductModel[] | null;
+  data?: ProductModelPaginatedList;
   /** @format date-time */
   timestamp?: string;
 }

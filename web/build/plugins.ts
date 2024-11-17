@@ -25,8 +25,9 @@ export function getPluginsList(
     // jsx、tsx语法支持
     vueJsx(),
     checker({
-      typescript: true,
-      vueTsc: true,
+      typescript: false,
+      vueTsc: false,
+      eslint: false,
       terminal: false,
       enableBuild: false
     }),

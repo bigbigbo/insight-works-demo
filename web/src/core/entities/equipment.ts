@@ -1,17 +1,16 @@
+import type { Equipment, Manufacturer } from "@/typings/api";
 import dayjs from "dayjs";
-import type { Manufacturer } from "@/typings/api";
 
-export class ManufacturerEntity implements Manufacturer {
-  id?: string;
-  manufacturerCode: string;
-  name: string;
-  address?: string | null;
+export class EquipmentEntity implements Equipment {
+  equipmentCode: string;
   contactPerson?: string | null;
   contactPhone?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  manufacturerId?: string;
+  manufacturer?: Manufacturer;
 
-  constructor(data: Partial<Manufacturer>) {
+  constructor(data: Partial<Equipment>) {
     Object.assign(this, data);
   }
 
