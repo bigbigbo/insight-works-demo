@@ -274,9 +274,24 @@ public class EquipmentSyncService : IEquipmentSyncService
                 throw new ArgumentException($"第{row}行的设备状态无效");
             }
 
-            if (!DateTime.TryParse(worksheet.Cells[row, 2].Text, out DateTime statusChangeTime))
+            if (!DateTime.TryParse(worksheet.Cells[row, 2].Value?.ToString(), out DateTime statusChangeTime))
             {
-                throw new ArgumentException($"第{row}行的状态变更时间格式无效");
+                // 尝试使用Excel的日期时间值
+                if (worksheet.Cells[row, 2].Value is double excelDate)
+                {
+                    try 
+                    {
+                        statusChangeTime = DateTime.FromOADate(excelDate);
+                    }
+                    catch
+                    {
+                        throw new ArgumentException($"第{row}行的状态变更时间格式无效，请使用标准日期时间格式（如：2024-03-21 14:30:00）");
+                    }
+                }
+                else 
+                {
+                    throw new ArgumentException($"第{row}行的状态变更时间格式无效，请使用标准日期时间格式（如：2024-03-21 14:30:00）");
+                }
             }
 
             statusList.Add(new EquipmentStatusHistory
