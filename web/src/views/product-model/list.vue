@@ -1,5 +1,5 @@
 <template>
-  <div class="product-model-list">
+  <div class="bg-white p-4 rounded-lg">
     <div class="header-actions mb-2">
       <el-button type="primary" @click="handleAdd">新增型号</el-button>
     </div>

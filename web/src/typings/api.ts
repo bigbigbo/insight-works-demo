@@ -96,6 +96,48 @@ export interface EquipmentPaginatedListApiResponse {
   timestamp?: string;
 }
 
+/** @format int32 */
+export enum EquipmentStatus {
+  Value0 = 0,
+  Value1 = 1,
+  Value2 = 2
+}
+
+export interface EquipmentStatusHistory {
+  /** @format uuid */
+  id?: string;
+  /** @format uuid */
+  equipmentId?: string;
+  status: EquipmentStatus;
+  /** @format date-time */
+  statusChangeTime: string;
+  /** @maxLength 50 */
+  executedBy?: string | null;
+  equipment?: Equipment;
+}
+
+export interface EquipmentStatusHistoryPaginatedList {
+  items?: EquipmentStatusHistory[] | null;
+  /** @format int32 */
+  pageIndex?: number;
+  /** @format int32 */
+  pageSize?: number;
+  /** @format int32 */
+  totalCount?: number;
+  /** @format int32 */
+  totalPages?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+}
+
+export interface EquipmentStatusHistoryPaginatedListApiResponse {
+  success?: boolean;
+  message?: string | null;
+  data?: EquipmentStatusHistoryPaginatedList;
+  /** @format date-time */
+  timestamp?: string;
+}
+
 export interface EquipmentSyncRecord {
   /** @format uuid */
   id?: string;
@@ -247,18 +289,18 @@ export interface ProductionData {
   /** @format uuid */
   productModelId?: string;
   batchNumber?: string | null;
-  /** @format double */
-  preLength?: number;
-  /** @format double */
-  preWidth?: number;
-  /** @format double */
-  preHeight?: number;
-  /** @format double */
-  postLength?: number;
-  /** @format double */
-  postWidth?: number;
-  /** @format double */
-  postHeight?: number;
+  /** @minLength 1 */
+  preLength: string;
+  /** @minLength 1 */
+  preWidth: string;
+  /** @minLength 1 */
+  preHeight: string;
+  /** @minLength 1 */
+  postLength: string;
+  /** @minLength 1 */
+  postWidth: string;
+  /** @minLength 1 */
+  postHeight: string;
   /** @format date-time */
   productionStartTime?: string;
   /** @format date-time */
@@ -277,18 +319,36 @@ export interface ProductionRecord {
    * @maxLength 100
    */
   batchNumber: string;
-  /** @format double */
-  preLength?: number;
-  /** @format double */
-  preWidth?: number;
-  /** @format double */
-  preHeight?: number;
-  /** @format double */
-  postLength?: number;
-  /** @format double */
-  postWidth?: number;
-  /** @format double */
-  postHeight?: number;
+  /**
+   * @minLength 1
+   * @maxLength 50
+   */
+  preLength: string;
+  /**
+   * @minLength 1
+   * @maxLength 50
+   */
+  preWidth: string;
+  /**
+   * @minLength 1
+   * @maxLength 50
+   */
+  preHeight: string;
+  /**
+   * @minLength 1
+   * @maxLength 50
+   */
+  postLength: string;
+  /**
+   * @minLength 1
+   * @maxLength 50
+   */
+  postWidth: string;
+  /**
+   * @minLength 1
+   * @maxLength 50
+   */
+  postHeight: string;
   /** @format date-time */
   productionStartTime?: string;
   /** @format date-time */
