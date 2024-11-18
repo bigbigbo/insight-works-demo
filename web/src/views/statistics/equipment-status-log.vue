@@ -144,8 +144,7 @@ const tableRef = ref();
   <div class="app-container">
     <div class="bg-white p-4 rounded-lg">
       <div class="flex">
-        <!-- 左侧树形控件 -->
-        <div class="w-48 mr-4 border-r pr-4 border-gray-200">
+        <div class="w-56 border-r border-gray-200">
           <el-tree
             :data="equipmentList"
             :props="{ label: 'label' }"
@@ -155,7 +154,7 @@ const tableRef = ref();
         </div>
 
         <!-- 右侧内容区 -->
-        <div class="flex-1">
+        <div class="flex-1 p-3">
           <el-form ref="queryRef" :model="queryParams" :inline="true">
             <el-form-item label="设备状态" prop="status">
               <el-select

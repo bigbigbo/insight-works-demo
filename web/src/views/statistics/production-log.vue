@@ -193,7 +193,7 @@ getEquipmentList();
 <template>
   <div class="bg-white p-4 rounded-lg flex flex-col h-full">
     <div class="flex flex-1">
-      <div class="equipment-tree">
+      <div class="w-56 border-r border-gray-200">
         <el-tree
           :data="modelList"
           node-key="id"
@@ -265,15 +265,9 @@ getEquipmentList();
   height: 100%;
 }
 
-.equipment-tree {
-  width: 250px;
-  padding: 10px;
-  border-right: 1px solid #dcdfe6;
-}
-
 .table-container {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   overflow-x: auto;
 }
 </style>

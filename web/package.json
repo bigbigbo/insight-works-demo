@@ -59,6 +59,7 @@
     "dayjs": "^1.11.12",
     "echarts": "^5.5.1",
     "element-plus": "^2.8.0",
+    "frappe-gantt": "^0.8.1",
     "js-cookie": "^3.0.5",
     "localforage": "^1.10.0",
     "mitt": "^3.0.1",
