@@ -16,4 +16,9 @@ public interface IStatisticsService
     /// 分页查询生产记录
     /// </summary>
     Task<ProductionRecordPagedResult> QueryProductionRecordsAsync(ProductionRecordQueryDTO query);
+
+    /// <summary>
+    /// 获取甘特图数据
+    /// </summary>
+    Task<List<GanttChartDTO>> GetGanttChartDataAsync(GanttChartQueryDTO query);
 } 

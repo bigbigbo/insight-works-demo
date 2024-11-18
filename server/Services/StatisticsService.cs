@@ -114,15 +114,18 @@ public class StatisticsService : IStatisticsService
             queryable = queryable.Where(p => p.ProductionEndTime <= query.EndTime);
         }
 
-        // 获取所有符合条件的记录的开始和结束时间
-        var times = await queryable
-            .Select(p => new { p.ProductionStartTime, p.ProductionEndTime })
-            .ToListAsync();
+        // 只在需要时计算平均生产时间
+        double avgProductionTime = 0;
+        if (query.CalculateAvgTime)
+        {
+            var times = await queryable
+                .Select(p => new { p.ProductionStartTime, p.ProductionEndTime })
+                .ToListAsync();
 
-        // 在内存中计算平均生产时间
-        var avgProductionTime = times.Any() 
-            ? times.Average(t => (t.ProductionEndTime - t.ProductionStartTime).TotalHours)
-            : 0;
+            avgProductionTime = times.Any()
+                ? times.Average(t => (t.ProductionEndTime - t.ProductionStartTime).TotalSeconds)
+                : 0;
+        }
 
         // 按生产开始时间倒序排序
         queryable = queryable.OrderByDescending(p => p.ProductionStartTime);
@@ -160,5 +163,97 @@ public class StatisticsService : IStatisticsService
         };
 
         return new ProductionRecordPagedResult(records, totalCount, query.PageIndex, query.PageSize, summary);
+    }
+
+    public async Task<List<GanttChartDTO>> GetGanttChartDataAsync(GanttChartQueryDTO query)
+    {
+        // 查询设备列表
+        var equipmentQuery = _context.Equipment
+            .Include(e => e.Manufacturer)
+            .AsQueryable();
+
+        if (query.EquipmentId.HasValue)
+        {
+            equipmentQuery = equipmentQuery.Where(e => e.Id == query.EquipmentId);
+        }
+        else if (!string.IsNullOrWhiteSpace(query.EquipmentCode))
+        {
+            equipmentQuery = equipmentQuery.Where(e => e.EquipmentCode == query.EquipmentCode);
+        }
+
+        var equipments = await equipmentQuery.ToListAsync();
+        if (!equipments.Any())
+        {
+            throw new KeyNotFoundException("未找到指定的设备");
+        }
+
+        var result = new List<GanttChartDTO>();
+
+        foreach (var equipment in equipments)
+        {
+            // 查询机况记录
+            var statusQuery = _context.EquipmentStatusHistories
+                .Where(h => h.EquipmentId == equipment.Id);
+
+            if (query.StartTime.HasValue)
+            {
+                statusQuery = statusQuery.Where(h => h.StatusChangeTime >= query.StartTime);
+            }
+
+            if (query.EndTime.HasValue)
+            {
+                statusQuery = statusQuery.Where(h => h.StatusChangeTime <= query.EndTime);
+            }
+
+            var statusRecords = await statusQuery
+                .OrderBy(h => h.StatusChangeTime)
+                .Select(h => new StatusRecord
+                {
+                    Status = h.Status,
+                    StatusChangeTime = h.StatusChangeTime,
+                    ExecutedBy = h.ExecutedBy
+                })
+                .ToListAsync();
+
+            // 查询生产记录
+            var productionQuery = _context.ProductionRecords
+                .Include(p => p.ProductModel)
+                .Where(p => p.EquipmentId == equipment.Id);
+
+            if (query.StartTime.HasValue)
+            {
+                productionQuery = productionQuery.Where(p => p.ProductionStartTime >= query.StartTime);
+            }
+
+            if (query.EndTime.HasValue)
+            {
+                productionQuery = productionQuery.Where(p => p.ProductionEndTime <= query.EndTime);
+            }
+
+            var productionRecords = await productionQuery
+                .OrderBy(p => p.ProductionStartTime)
+                .Select(p => new ProductionGanttRecord
+                {
+                    ModelCode = p.ProductModel.ModelCode,
+                    BatchNumber = p.BatchNumber,
+                    ProductionStartTime = p.ProductionStartTime,
+                    ProductionEndTime = p.ProductionEndTime
+                })
+                .ToListAsync();
+
+            result.Add(new GanttChartDTO
+            {
+                Equipment = new EquipmentInfo
+                {
+                    Id = equipment.Id,
+                    EquipmentCode = equipment.EquipmentCode,
+                    ManufacturerName = equipment.Manufacturer.Name
+                },
+                StatusRecords = statusRecords,
+                ProductionRecords = productionRecords
+            });
+        }
+
+        return result;
     }
 } 

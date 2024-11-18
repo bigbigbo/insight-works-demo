@@ -41,4 +41,9 @@ public class ProductionRecordQueryDTO : PaginationQuery
     /// 结束时间
     /// </summary>
     public DateTime? EndTime { get; set; }
+
+    /// <summary>
+    /// 是否计算平均生产时间
+    /// </summary>
+    public bool CalculateAvgTime { get; set; } = false;
 } 

@@ -51,4 +51,25 @@ public class StatisticsController : ControllerBase
             return StatusCode(500, ApiResponse<ProductionRecordPagedResult>.Fail(ex.Message));
         }
     }
+
+    /// <summary>
+    /// 获取甘特图数据
+    /// </summary>
+    [HttpGet("gantt-chart")]
+    public async Task<ActionResult<ApiResponse<List<GanttChartDTO>>>> GetGanttChartData([FromQuery] GanttChartQueryDTO query)
+    {
+        try
+        {
+            var data = await _statisticsService.GetGanttChartDataAsync(query);
+            return Ok(ApiResponse<List<GanttChartDTO>>.Ok(data));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ApiResponse<List<GanttChartDTO>>.Fail(ex.Message));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ApiResponse<List<GanttChartDTO>>.Fail(ex.Message));
+        }
+    }
 } 
