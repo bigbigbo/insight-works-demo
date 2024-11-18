@@ -34,4 +34,21 @@ public class StatisticsController : ControllerBase
             return StatusCode(500, ApiResponse<PaginatedList<EquipmentStatusHistory>>.Fail(ex.Message));
         }
     }
+
+    /// <summary>
+    /// 分页查询生产记录
+    /// </summary>
+    [HttpGet("production/records")]
+    public async Task<ActionResult<ApiResponse<ProductionRecordPagedResult>>> QueryProductionRecords([FromQuery] ProductionRecordQueryDTO query)
+    {
+        try
+        {
+            var result = await _statisticsService.QueryProductionRecordsAsync(query);
+            return Ok(ApiResponse<ProductionRecordPagedResult>.Ok(result));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ApiResponse<ProductionRecordPagedResult>.Fail(ex.Message));
+        }
+    }
 } 

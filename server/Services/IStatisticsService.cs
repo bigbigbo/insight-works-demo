@@ -11,4 +11,9 @@ public interface IStatisticsService
     /// 分页查询设备状态历史
     /// </summary>
     Task<PaginatedList<EquipmentStatusHistory>> QueryStatusHistoryAsync(StatusHistoryQueryDTO query);
+
+    /// <summary>
+    /// 分页查询生产记录
+    /// </summary>
+    Task<ProductionRecordPagedResult> QueryProductionRecordsAsync(ProductionRecordQueryDTO query);
 } 
