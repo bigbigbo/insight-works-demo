@@ -74,6 +74,13 @@ export interface EquipmentApiResponse {
   timestamp?: string;
 }
 
+export interface EquipmentInfo {
+  /** @format uuid */
+  id?: string;
+  equipmentCode?: string | null;
+  manufacturerName?: string | null;
+}
+
 export interface EquipmentPaginatedList {
   items?: Equipment[] | null;
   /** @format int32 */
@@ -94,6 +101,17 @@ export interface EquipmentPaginatedListApiResponse {
   data?: EquipmentPaginatedList;
   /** @format date-time */
   timestamp?: string;
+}
+
+export interface EquipmentProductionStat {
+  /** @format uuid */
+  equipmentId?: string;
+  equipmentCode?: string | null;
+  manufacturerName?: string | null;
+  /** @format int32 */
+  batchCount?: number;
+  /** @format double */
+  avgProductionTime?: number;
 }
 
 /** @format int32 */
@@ -173,6 +191,20 @@ export interface EquipmentSyncRecordPaginatedListApiResponse {
   success?: boolean;
   message?: string | null;
   data?: EquipmentSyncRecordPaginatedList;
+  /** @format date-time */
+  timestamp?: string;
+}
+
+export interface GanttChartDTO {
+  equipment?: EquipmentInfo;
+  statusRecords?: StatusRecord[] | null;
+  productionRecords?: ProductionGanttRecord[] | null;
+}
+
+export interface GanttChartDTOListApiResponse {
+  success?: boolean;
+  message?: string | null;
+  data?: GanttChartDTO[] | null;
   /** @format date-time */
   timestamp?: string;
 }
@@ -285,6 +317,30 @@ export interface ProductModelPaginatedListApiResponse {
   timestamp?: string;
 }
 
+export interface ProductModelStatDTO {
+  /** @format uuid */
+  modelId?: string;
+  modelCode?: string | null;
+  description?: string | null;
+  equipmentStats?: EquipmentProductionStat[] | null;
+}
+
+export interface ProductModelStatDTOListApiResponse {
+  success?: boolean;
+  message?: string | null;
+  data?: ProductModelStatDTO[] | null;
+  /** @format date-time */
+  timestamp?: string;
+}
+
+export interface ProductModelStatQueryDTO {
+  modelIds?: string[] | null;
+  /** @format date-time */
+  startTime?: string | null;
+  /** @format date-time */
+  endTime?: string | null;
+}
+
 export interface ProductionData {
   /** @format uuid */
   productModelId?: string;
@@ -301,6 +357,15 @@ export interface ProductionData {
   postWidth: string;
   /** @minLength 1 */
   postHeight: string;
+  /** @format date-time */
+  productionStartTime?: string;
+  /** @format date-time */
+  productionEndTime?: string;
+}
+
+export interface ProductionGanttRecord {
+  modelCode?: string | null;
+  batchNumber?: string | null;
   /** @format date-time */
   productionStartTime?: string;
   /** @format date-time */
@@ -357,8 +422,66 @@ export interface ProductionRecord {
   productModel?: ProductModel;
 }
 
+export interface ProductionRecordDTO {
+  /** @format uuid */
+  id?: string;
+  /** @format uuid */
+  equipmentId?: string;
+  equipmentCode?: string | null;
+  manufacturerName?: string | null;
+  /** @format uuid */
+  productModelId?: string;
+  modelCode?: string | null;
+  batchNumber?: string | null;
+  preLength?: string | null;
+  preWidth?: string | null;
+  preHeight?: string | null;
+  postLength?: string | null;
+  postWidth?: string | null;
+  postHeight?: string | null;
+  /** @format date-time */
+  productionStartTime?: string;
+  /** @format date-time */
+  productionEndTime?: string;
+}
+
+export interface ProductionRecordPagedResult {
+  items?: ProductionRecordDTO[] | null;
+  /** @format int32 */
+  totalCount?: number;
+  /** @format int32 */
+  pageIndex?: number;
+  /** @format int32 */
+  pageSize?: number;
+  /** @format int32 */
+  totalPages?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+  summary?: ProductionSummary;
+}
+
+export interface ProductionRecordPagedResultApiResponse {
+  success?: boolean;
+  message?: string | null;
+  data?: ProductionRecordPagedResult;
+  /** @format date-time */
+  timestamp?: string;
+}
+
+export interface ProductionSummary {
+  /** @format double */
+  avgProductionTime?: number;
+}
+
 export interface StatusData {
   status?: string | null;
+  /** @format date-time */
+  statusChangeTime?: string;
+  executedBy?: string | null;
+}
+
+export interface StatusRecord {
+  status?: EquipmentStatus;
   /** @format date-time */
   statusChangeTime?: string;
   executedBy?: string | null;

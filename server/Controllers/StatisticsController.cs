@@ -72,4 +72,25 @@ public class StatisticsController : ControllerBase
             return StatusCode(500, ApiResponse<List<GanttChartDTO>>.Fail(ex.Message));
         }
     }
+
+    /// <summary>
+    /// 获取产品型号生产统计
+    /// </summary>
+    [HttpPost("product-model/stats")]
+    public async Task<ActionResult<ApiResponse<List<ProductModelStatDTO>>>> GetProductModelStats([FromBody] ProductModelStatQueryDTO query)
+    {
+        try
+        {
+            var stats = await _statisticsService.GetProductModelStatsAsync(query);
+            return Ok(ApiResponse<List<ProductModelStatDTO>>.Ok(stats));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ApiResponse<List<ProductModelStatDTO>>.Fail(ex.Message));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ApiResponse<List<ProductModelStatDTO>>.Fail(ex.Message));
+        }
+    }
 } 

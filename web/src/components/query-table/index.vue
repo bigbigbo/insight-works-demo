@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, toRaw } from "vue";
+import { ref, onMounted } from "vue";
 import { ElTable, ElPagination } from "element-plus";
 
 interface Props {
@@ -15,13 +15,18 @@ interface Props {
   showIndex?: boolean;
   // 是否显示斑马纹
   stripe?: boolean;
+  // 是否显示统计行
+  showSummary?: boolean;
+  // 自定义统计行方法
+  summaryMethod?: (param: { columns: any[]; data: any[] }) => string[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
   immediate: true,
   params: () => ({}),
   showIndex: false,
-  stripe: false // 添加默认值
+  stripe: false,
+  showSummary: false
 });
 
 const emit = defineEmits(["update:loading"]);
@@ -36,6 +41,8 @@ const pagination = ref({
   pageSize: 10,
   total: 0
 });
+// 统计数据
+const summaryData = ref<any>(null);
 
 // 获取表格数据
 const getTableData = async () => {
@@ -53,6 +60,7 @@ const getTableData = async () => {
     if (res?.success) {
       tableData.value = res.data?.items || [];
       pagination.value.total = res.data?.totalCount || 0;
+      summaryData.value = res.data?.summary || null;
     }
   } finally {
     loading.value = false;
@@ -79,6 +87,16 @@ const refresh = () => {
   getTableData();
 };
 
+// 统计行计算方法
+const getSummaries = (param: { columns: any[]; data: any[] }) => {
+  if (props.summaryMethod) {
+    return props.summaryMethod(
+      Object.assign({}, param, { summaryData: summaryData.value })
+    );
+  }
+  return [];
+};
+
 // 暴露方法
 defineExpose({
   refresh
@@ -100,6 +118,8 @@ onMounted(() => {
       border
       style="width: 100%"
       :stripe="stripe"
+      :show-summary="showSummary"
+      :summary-method="getSummaries"
     >
       <el-table-column
         v-if="showIndex"

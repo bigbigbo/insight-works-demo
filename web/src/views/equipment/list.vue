@@ -71,22 +71,22 @@ const columns = [
   {
     prop: "equipmentCode",
     label: "设备编号",
-    width: 200
+    minWidth: 200
   },
   {
     prop: "manufacturer.name",
     label: "厂商名称",
-    width: 180
+    minWidth: 180
   },
   {
     prop: "contactPerson",
     label: "联系人",
-    width: 120
+    width: 200
   },
   {
     prop: "contactPhone",
     label: "联系电话",
-    width: 120
+    width: 200
   },
   {
     prop: "formattedCreatedAt",

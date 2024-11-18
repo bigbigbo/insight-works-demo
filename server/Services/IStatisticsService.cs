@@ -21,4 +21,9 @@ public interface IStatisticsService
     /// 获取甘特图数据
     /// </summary>
     Task<List<GanttChartDTO>> GetGanttChartDataAsync(GanttChartQueryDTO query);
+
+    /// <summary>
+    /// 获取产品型号生产统计
+    /// </summary>
+    Task<List<ProductModelStatDTO>> GetProductModelStatsAsync(ProductModelStatQueryDTO query);
 } 

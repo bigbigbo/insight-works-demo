@@ -25,6 +25,24 @@ export default {
         title: "生产记录",
         showParent: true
       }
+    },
+    {
+      path: "/statistics/gantt-chart",
+      name: "GanttChart",
+      component: () => import("@/views/statistics/gantt-chart.vue"),
+      meta: {
+        title: "甘特图",
+        showParent: true
+      }
+    },
+    {
+      path: "/statistics/production-avg-time",
+      name: "ProductionAvgTime",
+      component: () => import("@/views/statistics/production-avg-time.vue"),
+      meta: {
+        title: "平均生产时间",
+        showParent: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;

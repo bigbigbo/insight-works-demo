@@ -256,4 +256,60 @@ public class StatisticsService : IStatisticsService
 
         return result;
     }
+
+    public async Task<List<ProductModelStatDTO>> GetProductModelStatsAsync(ProductModelStatQueryDTO query)
+    {
+        // 查询产品型号信息
+        var models = await _context.ProductModels
+            .Where(m => query.ModelIds.Contains(m.Id))
+            .ToListAsync();
+
+        if (!models.Any())
+        {
+            throw new KeyNotFoundException("未找到指定的产品型号");
+        }
+
+        var result = new List<ProductModelStatDTO>();
+
+        foreach (var model in models)
+        {
+            // 查询该型号的所有生产记录，包括设备和厂商信息
+            var records = await _context.ProductionRecords
+                .Include(p => p.Equipment)
+                    .ThenInclude(e => e.Manufacturer)
+                .Where(p => p.ProductModelId == model.Id)
+                .Where(p => !query.StartTime.HasValue || p.ProductionStartTime >= query.StartTime)
+                .Where(p => !query.EndTime.HasValue || p.ProductionEndTime <= query.EndTime)
+                .ToListAsync();
+
+            // 在内存中进行分组和统计
+            var equipmentStats = records
+                .GroupBy(p => new 
+                { 
+                    p.EquipmentId, 
+                    p.Equipment.EquipmentCode, 
+                    ManufacturerName = p.Equipment.Manufacturer.Name 
+                })
+                .Select(g => new EquipmentProductionStat
+                {
+                    EquipmentId = g.Key.EquipmentId,
+                    EquipmentCode = g.Key.EquipmentCode,
+                    ManufacturerName = g.Key.ManufacturerName,
+                    BatchCount = g.Count(),
+                    AvgProductionTime = Math.Round(g.Average(p => 
+                        (p.ProductionEndTime - p.ProductionStartTime).TotalHours), 2)
+                })
+                .ToList();
+
+            result.Add(new ProductModelStatDTO
+            {
+                ModelId = model.Id,
+                ModelCode = model.ModelCode,
+                Description = model.Description,
+                EquipmentStats = equipmentStats
+            });
+        }
+
+        return result;
+    }
 } 
