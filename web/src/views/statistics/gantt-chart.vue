@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { StatisticsService } from "@/core/services/statistics";
-import { gantt } from "@/lib/dhtmlx-gantt/dhtmlxgantt.es";
 import dayjs from "dayjs";
+import { gantt } from "@/lib/dhtmlx-gantt/dhtmlxgantt.es";
+
+import { StatisticsService } from "@/core/services/statistics";
 import { EquipmentService } from "@/core/services/equipment";
 import type { EquipmentEntity } from "@/core/entities/equipment";
+import { EquipmentStatus } from "@/typings/api";
 
 defineOptions({
   name: "GanttChart"
@@ -13,8 +15,8 @@ defineOptions({
 const equipmentList = ref<EquipmentEntity[]>([]);
 const selectedEquipment = ref<string>("");
 const dateRange = ref<[string, string]>([
-  dayjs().startOf("year").format("YYYY-MM-DD"), // 修改为今年年初
-  dayjs().endOf("year").format("YYYY-MM-DD") // 修改为今年年末
+  dayjs().startOf("year").format("YYYY-MM-DD"),
+  dayjs().endOf("year").format("YYYY-MM-DD")
 ]);
 
 // 时间跨度选项
@@ -29,9 +31,9 @@ const selectedTimeScale = ref("month");
 
 const formatStatusText = (status: number) => {
   const statusMap = {
-    0: "正常",
-    1: "异常",
-    2: "警告"
+    [EquipmentStatus.Value0]: "正常",
+    [EquipmentStatus.Value1]: "警告",
+    [EquipmentStatus.Value2]: "异常"
   };
   return statusMap[status] || "未知状态";
 };
@@ -228,8 +230,8 @@ onMounted(() => {
           start-placeholder="开始日期"
           end-placeholder="结束日期"
           :default-value="[
-            dayjs().startOf('year').toDate(), // 修改为今年年初
-            dayjs().endOf('year').toDate() // 修改为今年年末
+            dayjs().startOf('year').toDate(),
+            dayjs().endOf('year').toDate()
           ]"
           @change="handleDateRangeChange"
         />
@@ -258,7 +260,6 @@ onMounted(() => {
 <style>
 @import "@/lib/dhtmlx-gantt/dhtmlxgantt.css";
 
-/* 不同状态的任务颜色样式 */
 .status-normal .gantt_task_progress {
   background: #4caf50;
 }

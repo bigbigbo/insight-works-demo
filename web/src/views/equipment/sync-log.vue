@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { h, ref } from "vue";
+import { ElTag } from "element-plus";
+
 import QueryTable from "@/components/query-table/index.vue";
 import { EquipmentSyncService } from "@/core/services/equipment-sync";
 import { SyncType, SyncStatus } from "@/typings/api";
-import { ElTag } from "element-plus";
 
 defineOptions({
   name: "EquipmentSyncLog"

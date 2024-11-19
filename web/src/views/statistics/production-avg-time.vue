@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
+import * as echarts from "echarts";
+
 import { ProductModelService } from "@/core/services/product-model";
 import { StatisticsService } from "@/core/services/statistics";
-import * as echarts from "echarts";
 
 defineOptions({
   name: "ProductionAvgTime"
@@ -21,7 +22,6 @@ const modelList = ref([]);
 // 为每个型号生成固定的颜色并保存
 const modelColors = ref<Record<string, string>>({});
 
-// 使用普通变量存储 chart 实例
 let chartInstance: echarts.ECharts | null = null;
 
 const getModelList = async () => {
@@ -31,10 +31,8 @@ const getModelList = async () => {
       pageSize: 100
     });
     modelList.value = res.data?.items || [];
-    // 默认选中所有产品型号
     selectedModels.value = modelList.value.map(model => model.id);
 
-    // 为每个型号生成固定的颜色
     modelList.value.forEach(model => {
       if (!modelColors.value[model.modelCode]) {
         modelColors.value[model.modelCode] =
@@ -65,7 +63,6 @@ const updateChart = async () => {
     const res = await StatisticsService.getProductionAvgTime(params);
     const data = res.data || [];
 
-    // 获取所有设备编号
     const allEquipments = new Set<string>();
     data.forEach(model => {
       model.equipmentStats.forEach(stat => {
@@ -74,13 +71,12 @@ const updateChart = async () => {
     });
     const equipments = Array.from(allEquipments);
 
-    // 处理数据
     const series = data.map(model => {
       return {
         name: model.modelCode,
         type: "bar",
         itemStyle: {
-          color: modelColors.value[model.modelCode] // 使用保存的固定颜色
+          color: modelColors.value[model.modelCode]
         },
         data: equipments.map(code => {
           const stat = model.equipmentStats.find(s => s.equipmentCode === code);
@@ -93,11 +89,10 @@ const updateChart = async () => {
       };
     });
 
-    // 设置完整的图表配置
     const option = {
       tooltip: {
         show: true,
-        trigger: "item", // 修改为item,只显示当前柱状图的tooltip
+        trigger: "item",
         axisPointer: {
           type: "shadow"
         },

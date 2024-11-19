@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, nextTick, watch } from "vue";
+import { ref, nextTick, watch, onMounted } from "vue";
 import { ElTree } from "element-plus";
+
 import { EquipmentService } from "@/core/services/equipment";
 import { StatisticsService } from "@/core/services/statistics";
 import { ProductModelService } from "@/core/services/product-model";
@@ -11,33 +12,8 @@ defineOptions({
   name: "ProductionLog"
 });
 
-// 产品型号树相关
 const modelList = ref<any[]>([]);
 const selectedModel = ref<string>();
-
-const getModelList = async () => {
-  const res = await ProductModelService.getList({
-    pageIndex: 1,
-    pageSize: 999
-  });
-  if (res.success) {
-    modelList.value = [
-      {
-        id: "",
-        modelCode: "全部型号",
-        children: res.data?.items || []
-      }
-    ];
-  }
-};
-
-const handleNodeClick = async (data: any) => {
-  selectedModel.value = data.id === "" ? undefined : data.modelCode;
-  await nextTick();
-  tableRef.value?.refresh();
-};
-
-// 查询条件相关
 const dateRange = ref<[string, string]>(["", ""]);
 const queryForm = ref({
   startTime: "",
@@ -45,28 +21,9 @@ const queryForm = ref({
   equipmentId: "",
   batchNumber: ""
 });
-
-watch(dateRange, newVal => {
-  queryForm.value.startTime = newVal[0];
-  queryForm.value.endTime = newVal[1];
-});
-
 const equipmentOptions = ref<Equipment[]>([]);
-
-const getEquipmentList = async () => {
-  const res = await EquipmentService.getList({
-    pageIndex: 1,
-    pageSize: 999
-  });
-  if (res.success) {
-    equipmentOptions.value = res.data?.items || [];
-  }
-};
-
-// 表格相关
 const tableRef = ref();
 const loading = ref(false);
-
 const columns = [
   {
     prop: "equipmentCode",
@@ -132,6 +89,38 @@ const columns = [
   }
 ];
 
+const getModelList = async () => {
+  const res = await ProductModelService.getList({
+    pageIndex: 1,
+    pageSize: 999
+  });
+  if (res.success) {
+    modelList.value = [
+      {
+        id: "",
+        modelCode: "全部型号",
+        children: res.data?.items || []
+      }
+    ];
+  }
+};
+
+const handleNodeClick = async (data: any) => {
+  selectedModel.value = data.id === "" ? undefined : data.modelCode;
+  await nextTick();
+  tableRef.value?.refresh();
+};
+
+const getEquipmentList = async () => {
+  const res = await EquipmentService.getList({
+    pageIndex: 1,
+    pageSize: 999
+  });
+  if (res.success) {
+    equipmentOptions.value = res.data?.items || [];
+  }
+};
+
 const getTableParams = () => {
   const params: Record<string, any> = {
     calculateAvgTime: false,
@@ -186,8 +175,15 @@ const handleReset = () => {
 //   return sums;
 // };
 
-getModelList();
-getEquipmentList();
+watch(dateRange, newVal => {
+  queryForm.value.startTime = newVal[0];
+  queryForm.value.endTime = newVal[1];
+});
+
+onMounted(() => {
+  getModelList();
+  getEquipmentList();
+});
 </script>
 
 <template>

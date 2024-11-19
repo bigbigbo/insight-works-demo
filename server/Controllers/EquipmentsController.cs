@@ -48,7 +48,7 @@ public class EquipmentsController : ControllerBase
     [HttpPost("create")]
     public async Task<ActionResult<ApiResponse<Equipment>>> CreateEquipment([FromBody] CreateEquipmentDTO data)
     {
-        try 
+        try
         {
             var equipment = await _equipmentService.CreateEquipmentAsync(data);
             return Ok(ApiResponse<Equipment>.Ok(equipment, "Equipment created successfully"));
@@ -90,4 +90,4 @@ public class EquipmentsController : ControllerBase
             return NotFound(ApiResponse<object>.Fail(ex.Message));
         }
     }
-} 
+}

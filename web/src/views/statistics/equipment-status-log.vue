@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { h, ref, onMounted } from "vue";
+import { ElTag, ElTree } from "element-plus";
+import dayjs from "dayjs";
+
 import QueryTable from "@/components/query-table/index.vue";
 import { StatisticsService } from "@/core/services/statistics";
 import { EquipmentService } from "@/core/services/equipment";
 import type { EquipmentStatusHistory } from "@/typings/api";
 import { EquipmentStatus } from "@/typings/api";
-import { ElTag, ElTree } from "element-plus";
-import dayjs from "dayjs";
 
 defineOptions({
   name: "EquipmentStatusLog"
@@ -14,33 +15,7 @@ defineOptions({
 
 const loading = ref(false);
 const equipmentList = ref([]);
-const selectedEquipmentId = ref("");
-
-// 获取设备列表
-const getEquipmentList = async () => {
-  const res = await EquipmentService.getList({
-    pageIndex: 1,
-    pageSize: 999
-  });
-  if (res.data?.items) {
-    equipmentList.value = [
-      {
-        id: "",
-        label: "全部设备",
-        children: res.data.items.map((item: any) => ({
-          id: item.id,
-          label: `${item.manufacturer.name}-${item.equipmentCode}`
-        }))
-      }
-    ];
-  }
-};
-
-onMounted(() => {
-  getEquipmentList();
-});
-
-// 查询条件
+const tableRef = ref();
 const queryParams = ref({
   equipmentId: "",
   startTime: "",
@@ -48,18 +23,6 @@ const queryParams = ref({
   status: "",
   executedBy: ""
 });
-
-// 选择设备
-const handleNodeClick = (data: any, node: any) => {
-  // 如果点击的是全部设备,则阻止收起展开
-  if (data.id === "") {
-    node.expanded = true;
-  }
-  queryParams.value.equipmentId = data.id;
-  handleQuery();
-};
-
-// 状态选项
 const statusOptions = [
   {
     value: EquipmentStatus.Value0,
@@ -75,7 +38,6 @@ const statusOptions = [
   }
 ];
 
-// 表格列配置
 const columns = [
   {
     prop: "equipment.equipmentCode",
@@ -120,12 +82,37 @@ const columns = [
   }
 ];
 
-// 查询方法
+const getEquipmentList = async () => {
+  const res = await EquipmentService.getList({
+    pageIndex: 1,
+    pageSize: 999
+  });
+  if (res.data?.items) {
+    equipmentList.value = [
+      {
+        id: "",
+        label: "全部设备",
+        children: res.data.items.map((item: any) => ({
+          id: item.id,
+          label: `${item.manufacturer.name}-${item.equipmentCode}`
+        }))
+      }
+    ];
+  }
+};
+
+const handleNodeClick = (data: any, node: any) => {
+  if (data.id === "") {
+    node.expanded = true;
+  }
+  queryParams.value.equipmentId = data.id;
+  handleQuery();
+};
+
 const handleQuery = () => {
   tableRef.value?.refresh();
 };
 
-// 重置查询
 const handleReset = () => {
   queryParams.value = {
     equipmentId: "",
@@ -137,7 +124,9 @@ const handleReset = () => {
   handleQuery();
 };
 
-const tableRef = ref();
+onMounted(() => {
+  getEquipmentList();
+});
 </script>
 
 <template>
@@ -153,7 +142,6 @@ const tableRef = ref();
           />
         </div>
 
-        <!-- 右侧内容区 -->
         <div class="flex-1 p-3">
           <el-form ref="queryRef" :model="queryParams" :inline="true">
             <el-form-item label="设备状态" prop="status">
@@ -200,7 +188,6 @@ const tableRef = ref();
             </el-form-item>
           </el-form>
 
-          <!-- 表格区域 -->
           <QueryTable
             ref="tableRef"
             v-model:loading="loading"
