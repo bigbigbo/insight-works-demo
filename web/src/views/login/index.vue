@@ -96,7 +96,7 @@ onBeforeUnmount(() => {
       </div>
       <div class="login-box">
         <div class="login-form">
-          <img src="https://www.jhicc.com/images/in_logo.jpg" />
+          <avatar class="avatar" />
           <Motion>
             <h2 class="outline-none">{{ title }}</h2>
           </Motion>
